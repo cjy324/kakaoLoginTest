@@ -40,11 +40,21 @@ public class KakaoController {
 		System.out.println("### 카카오nickname ### : " + userInfo.get("nickname"));
 		System.out.println("### 카카오프로필 이미지(원본) ### : " + userInfo.get("profile_image"));
 		System.out.println("### 카카오프로필 이미지(썸네일) ### : " + userInfo.get("thumbnail_image"));
-		
-		
-		// 4.session 값 셋팅
+
+		/* (나에게 메시지 보내기 기능 추가) */ 
+		// 4.사용자토큰으로 로그인한 유저(본인)에게 카카오 메시지 보내기
+		System.out.println("-------결과4-------");
+		// responseCode: 200 => 성공
+		boolean isSendMessage = kakaoService.isSendMessage(access_Token);
+		String result = "카카오톡 나에게 메시지 보내기에 실패하였습니다.";
+		if (isSendMessage) {
+			result = "카카오톡 나에게 메시지 보내기에 성공하였습니다.";
+		}
+
+		// 5.session 값 셋팅
 		session.setAttribute("access_Token", access_Token);
 		session.setAttribute("nickname", userInfo.get("nickname"));
+		session.setAttribute("result", result);
 		session.setAttribute("email", userInfo.get("email"));
 		session.setAttribute("profile_image", userInfo.get("profile_image"));
 		session.setAttribute("thumbnail_image", userInfo.get("thumbnail_image"));
@@ -58,23 +68,25 @@ public class KakaoController {
 		kakaoService.kakaoLogout((String) session.getAttribute("access_Token"));
 		session.removeAttribute("access_Token");
 		session.removeAttribute("nickname");
+		session.removeAttribute("result");
 		session.removeAttribute("email");
 		session.removeAttribute("profile_image");
 		session.removeAttribute("thumbnail_image");
-		
+
 		return "logout";
 	}
-	
+
 	// 앱과 연결된 카카오계정 연결해제(정보제공 여부도 전부 초기화)
 	@RequestMapping("/unlink")
 	public String unlink(HttpSession session) {
 		kakaoService.kakaoUnlink((String) session.getAttribute("access_Token"));
 		session.removeAttribute("access_Token");
 		session.removeAttribute("nickname");
+		session.removeAttribute("result");
 		session.removeAttribute("email");
 		session.removeAttribute("profile_image");
 		session.removeAttribute("thumbnail_image");
-		
+
 		return "logout";
 	}
 
